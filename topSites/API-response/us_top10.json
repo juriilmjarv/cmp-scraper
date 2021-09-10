@@ -1,0 +1,205 @@
+{
+    "Ats": {
+        "OperationRequest": {
+            "RequestId": "eb59ad83-13cf-4cee-a288-d05cac19fe3e"
+        },
+        "Results": {
+            "Result": {
+                "Alexa": {
+                    "Request": {
+                        "Arguments": {
+                            "Argument": [
+                                {
+                                    "Name": "countrycode",
+                                    "Value": "US"
+                                },
+                                {
+                                    "Name": "count",
+                                    "Value": "10"
+                                },
+                                {
+                                    "Name": "responsegroup",
+                                    "Value": "Country"
+                                }
+                            ]
+                        }
+                    },
+                    "TopSites": {
+                        "Country": {
+                            "CountryName": "United States",
+                            "CountryCode": "US",
+                            "TotalSites": "138200",
+                            "Sites": {
+                                "Site": [
+                                    {
+                                        "DataUrl": "google.com",
+                                        "Country": {
+                                            "Rank": "1",
+                                            "Reach": {
+                                                "PerMillion": "824100"
+                                            },
+                                            "PageViews": {
+                                                "PerMillion": "284710",
+                                                "PerUser": "26.45"
+                                            }
+                                        },
+                                        "Global": {
+                                            "Rank": "1"
+                                        }
+                                    },
+                                    {
+                                        "DataUrl": "youtube.com",
+                                        "Country": {
+                                            "Rank": "2",
+                                            "Reach": {
+                                                "PerMillion": "344000"
+                                            },
+                                            "PageViews": {
+                                                "PerMillion": "55570",
+                                                "PerUser": "12.37"
+                                            }
+                                        },
+                                        "Global": {
+                                            "Rank": "2"
+                                        }
+                                    },
+                                    {
+                                        "DataUrl": "amazon.com",
+                                        "Country": {
+                                            "Rank": "3",
+                                            "Reach": {
+                                                "PerMillion": "199600"
+                                            },
+                                            "PageViews": {
+                                                "PerMillion": "28610",
+                                                "PerUser": "10.97"
+                                            }
+                                        },
+                                        "Global": {
+                                            "Rank": "11"
+                                        }
+                                    },
+                                    {
+                                        "DataUrl": "yahoo.com",
+                                        "Country": {
+                                            "Rank": "4",
+                                            "Reach": {
+                                                "PerMillion": "143300"
+                                            },
+                                            "PageViews": {
+                                                "PerMillion": "10770",
+                                                "PerUser": "5.75"
+                                            }
+                                        },
+                                        "Global": {
+                                            "Rank": "12"
+                                        }
+                                    },
+                                    {
+                                        "DataUrl": "facebook.com",
+                                        "Country": {
+                                            "Rank": "5",
+                                            "Reach": {
+                                                "PerMillion": "106000"
+                                            },
+                                            "PageViews": {
+                                                "PerMillion": "10120",
+                                                "PerUser": "7.31"
+                                            }
+                                        },
+                                        "Global": {
+                                            "Rank": "7"
+                                        }
+                                    },
+                                    {
+                                        "DataUrl": "zoom.us",
+                                        "Country": {
+                                            "Rank": "6",
+                                            "Reach": {
+                                                "PerMillion": "99700"
+                                            },
+                                            "PageViews": {
+                                                "PerMillion": "5152",
+                                                "PerUser": "3.96"
+                                            }
+                                        },
+                                        "Global": {
+                                            "Rank": "16"
+                                        }
+                                    },
+                                    {
+                                        "DataUrl": "reddit.com",
+                                        "Country": {
+                                            "Rank": "7",
+                                            "Reach": {
+                                                "PerMillion": "70300"
+                                            },
+                                            "PageViews": {
+                                                "PerMillion": "5029",
+                                                "PerUser": "5.48"
+                                            }
+                                        },
+                                        "Global": {
+                                            "Rank": "19"
+                                        }
+                                    },
+                                    {
+                                        "DataUrl": "bing.com",
+                                        "Country": {
+                                            "Rank": "8",
+                                            "Reach": {
+                                                "PerMillion": "72700"
+                                            },
+                                            "PageViews": {
+                                                "PerMillion": "3256",
+                                                "PerUser": "3.43"
+                                            }
+                                        },
+                                        "Global": {
+                                            "Rank": "28"
+                                        }
+                                    },
+                                    {
+                                        "DataUrl": "wikipedia.org",
+                                        "Country": {
+                                            "Rank": "9",
+                                            "Reach": {
+                                                "PerMillion": "66300"
+                                            },
+                                            "PageViews": {
+                                                "PerMillion": "3116",
+                                                "PerUser": "3.6"
+                                            }
+                                        },
+                                        "Global": {
+                                            "Rank": "13"
+                                        }
+                                    },
+                                    {
+                                        "DataUrl": "office.com",
+                                        "Country": {
+                                            "Rank": "10",
+                                            "Reach": {
+                                                "PerMillion": "47600"
+                                            },
+                                            "PageViews": {
+                                                "PerMillion": "8966",
+                                                "PerUser": "14.4"
+                                            }
+                                        },
+                                        "Global": {
+                                            "Rank": "23"
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                }
+            },
+            "ResponseStatus": {
+                "StatusCode": "200"
+            }
+        }
+    }
+}
