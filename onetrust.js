@@ -5,6 +5,7 @@ import CookieDB from './models/consent_data.js';
 import DbConnectionString from './config.js';
 import top100 from './topSites/finalData/top100.js';
 import top200 from './topSites/finalData/top200.js';
+import top500 from './topSites/finalData/top500.js';
 /*
 Check if page is using OneTrust cookie Consent forms
 If detected, extract consent block data
@@ -23,11 +24,27 @@ const queue = new PQueue({
                 defaultViewport: null,
             });
 
+            //Database connection string
+            const DB_URL = DbConnectionString;
+
+            //Establish DB connection
+            if (mongoose.connection.readyState == 0) {
+                mongoose.connect(DB_URL)
+                    .then( () => {
+                        console.log('Connected to database ')
+                    })
+                    .catch( (err) => {
+                        console.error(`Error connecting to the database. \n${err}`);
+                    });
+            }
+
             // task processor function
             const createInstance = async (url) => {
                 let real_instance = await instance;  // await here
                 let page = await real_instance.newPage();
                 await page.goto(url, { waitUntil: 'networkidle0' });
+                await page.waitForTimeout(2000);
+                await autoScroll(page);
 
                 //Check if using oneTrust at all
                 const isOneTrust = await page.evaluate(() => {
@@ -43,7 +60,7 @@ const queue = new PQueue({
                 let rejectBtnStyles = 'none';
                 let cookieSettingsBtnStyles = 'none';
                 let acceptBtnStyles = 'none';
-                let preCheckedBoxes = false;
+                let preCheckedBoxes = [];
 
                 if(isOneTrust){
 
@@ -61,7 +78,7 @@ const queue = new PQueue({
                         }
                     });
 
-                    //get reject button color
+                    //rejectBtn
                     rejectBtnStyles = await page.evaluate(() => {
                         let el = document.querySelector('button[id="onetrust-reject-all-handler"]')
                         if (el) {
@@ -91,24 +108,28 @@ const queue = new PQueue({
                         }
                     });
 
-                    //await page.click('button[id="onetrust-pc-btn-handler"]');
-                    //await page.waitForTimeout(2000);
+                    //click on cookie settings button
+                    await page.click('button[id="onetrust-pc-btn-handler"]');
+                    await page.waitForTimeout(2000);
 
-                    preCheckedBoxes = await page.evaluate(() => {
-                        let querySelector = document.querySelectorAll('input.category-switch-handler');
-                        if (querySelector.length >= 1) {
-                            let arr = [];
-                            for(var i=0; i<querySelector.length; i++){
-                                if(querySelector[i].ariaChecked === 'true'){
+                    //Start looking if consent form has any pre-checked boxes
+                    const sections = await page.$$('input.category-switch-handler');
+
+                    if(sections) {
+                        for(let i=0; i<sections.length; i++) {
+                            let isPreChecked = await page.evaluate((i) => {
+                                let querySelector = document.querySelectorAll('input.category-switch-handler');
+                                let activeGroup = querySelector[i].parentElement.parentElement.classList.contains('ot-always-active-group');
+                                let alwaysActiveDiv = Array.from(querySelector[i].parentElement.parentElement.childNodes).find((node) => node.className === 'ot-always-active') ? true : false;
+                                if(querySelector[i].ariaChecked === 'true' && activeGroup == false && alwaysActiveDiv == false){
                                     return true;
                                 } else {
                                     return false;
                                 }
-                            }
-                        } else {
-                            return false;
+                            }, i);
+                            preCheckedBoxes.push(isPreChecked);
                         }
-                    });                
+                    }
                 }
 
                 //insert or update DB records
@@ -119,16 +140,16 @@ const queue = new PQueue({
                         acceptBtn: acceptBtnStyles,
                         rejectBtn: rejectBtnStyles,
                         cookieBtn: cookieSettingsBtnStyles,
-                        preChecked: preCheckedBoxes,
+                        preChecked: preCheckedBoxes.includes(true),
                     });
                 }
                 //INSERT INTO DB?
-                // console.log('URL: ', url);
-                // console.log('AcceptBtn: ', acceptBtnStyles);
-                // console.log('RejectBtn: ', rejectBtnStyles);
-                // console.log('CookieBtn: ', cookieSettingsBtnStyles);
+                //console.log('URL: ', url);
+                 //console.log('AcceptBtn: ', acceptBtnStyles);
+                 //console.log('RejectBtn: ', rejectBtnStyles);
+                 //console.log('CookieBtn: ', cookieSettingsBtnStyles);
                 // console.log('HTML Block: ', htmlBlock);
-                //console.log(preCheckedBoxes);
+                //console.log('pre: ', preCheckedBoxes.includes(true));
 
                 //Check if all tasks done
                 if (queue.size === 0 && queue.pending === 1) {
@@ -143,12 +164,14 @@ const queue = new PQueue({
             }
 
             let urls = [
-                "https://cloudflare.com/",
-                "https://natwest.com"
+                "https://spotify.com",
+                "https://adobe.com",
+                "https://natwest.com",
+                "https://discord.com",
             ];
 
             // add tasks to queue
-            for (let url of urls) {
+            for (let url of top500) {
                 queue.add(async () => createInstance(url));
             }
 
@@ -160,17 +183,6 @@ const queue = new PQueue({
 )()
 
 function upsertDb(userObj) {
-    const DB_URL = DbConnectionString;
-
-    if (mongoose.connection.readyState == 0) {
-        mongoose.connect(DB_URL)
-            .then( () => {
-                console.log('Connected to database ')
-            })
-            .catch( (err) => {
-                console.error(`Error connecting to the database. \n${err}`);
-            });
-    }
 
     // if this email exists, update the entry, don't insert
     const conditions = { url: userObj.url };
@@ -180,6 +192,25 @@ function upsertDb(userObj) {
         if (err) {
         throw err;
         }
+    });
+}
+
+async function autoScroll(page){
+    await page.evaluate(async () => {
+        await new Promise((resolve, reject) => {
+            var totalHeight = 0;
+            var distance = 100;
+            var timer = setInterval(() => {
+                var scrollHeight = document.body.scrollHeight;
+                window.scrollBy(0, distance);
+                totalHeight += distance;
+
+                if(totalHeight >= scrollHeight){
+                    clearInterval(timer);
+                    resolve();
+                }
+            }, 100);
+        });
     });
 }
   

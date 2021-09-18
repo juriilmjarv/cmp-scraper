@@ -78,7 +78,7 @@ const top500 = [
   "https://argos.co.uk",
   "https://barclays.co.uk",
   "https://tesco.com",
-  "https://ikea.com",
+  "https://www.ikea.com",
   "https://deviantart.com",
   "https://tumblr.com",
   "https://bbc.com",
