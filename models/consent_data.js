@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 let consentSchema = new mongoose.Schema({
     url: String,
     html: String,
+    darkPattern: Boolean,
     acceptBtn: String,
     rejectBtn: String,
     cookieBtn: String,

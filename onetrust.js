@@ -6,6 +6,8 @@ import DbConnectionString from './config.js';
 import top100 from './topSites/finalData/top100.js';
 import top200 from './topSites/finalData/top200.js';
 import top500 from './topSites/finalData/top500.js';
+import top1000 from './topSites/finalData/top1000.js';
+import top1600 from './topSites/finalData/top1600.js';
 /*
 Check if page is using OneTrust cookie Consent forms
 If detected, extract consent block data
@@ -43,7 +45,9 @@ const queue = new PQueue({
                 let real_instance = await instance;  // await here
                 let page = await real_instance.newPage();
                 await page.goto(url, { waitUntil: 'networkidle0' });
+                //Wait for page 2 secs
                 await page.waitForTimeout(2000);
+                //scroll to bottom
                 await autoScroll(page);
 
                 //Check if using oneTrust at all
@@ -61,6 +65,7 @@ const queue = new PQueue({
                 let cookieSettingsBtnStyles = 'none';
                 let acceptBtnStyles = 'none';
                 let preCheckedBoxes = [];
+                let isDarkPattern = false;
 
                 if(isOneTrust){
 
@@ -115,7 +120,7 @@ const queue = new PQueue({
                     //Start looking if consent form has any pre-checked boxes
                     const sections = await page.$$('input.category-switch-handler');
 
-                    if(sections) {
+                    if (sections) {
                         for(let i=0; i<sections.length; i++) {
                             let isPreChecked = await page.evaluate((i) => {
                                 let querySelector = document.querySelectorAll('input.category-switch-handler');
@@ -130,6 +135,36 @@ const queue = new PQueue({
                             preCheckedBoxes.push(isPreChecked);
                         }
                     }
+
+                    //Accept and settings buttons different
+                    if (acceptBtnStyles != cookieSettingsBtnStyles && rejectBtnStyles == 'none') {
+                        isDarkPattern = true;
+                    //accept and reject same but settings different
+                    } else if (acceptBtnStyles == rejectBtnStyles && acceptBtnStyles != cookieSettingsBtnStyles) {
+                        if(preCheckedBoxes.includes(true)) {
+                            isDarkPattern = true;
+                        } else {
+                            isDarkPattern = false;
+                        }
+                    //all buttons same but have prechecked
+                    } else if (acceptBtnStyles == rejectBtnStyles && acceptBtnStyles == cookieSettingsBtnStyles) {
+                        if(preCheckedBoxes.includes(true)) {
+                            isDarkPattern = true;
+                        } else {
+                            isDarkPattern = false;
+                        }
+                    //only accept button
+                    } else if (acceptBtnStyles != 'none' && cookieSettingsBtnStyles == 'none' && rejectBtnStyles == 'none') {
+                        isDarkPattern = true;
+                    //buttons ok but have prechecked
+                    } else {
+                        if(preCheckedBoxes.includes(true)) {
+                            isDarkPattern = true;
+                        } else {
+                            isDarkPattern = false;
+                        }
+                    }
+                    
                 }
 
                 //insert or update DB records
@@ -137,6 +172,7 @@ const queue = new PQueue({
                     upsertDb({
                         url: url,
                         html: htmlBlock,
+                        darkPattern: isDarkPattern,
                         acceptBtn: acceptBtnStyles,
                         rejectBtn: rejectBtnStyles,
                         cookieBtn: cookieSettingsBtnStyles,
@@ -163,15 +199,55 @@ const queue = new PQueue({
                 }
             }
 
-            let urls = [
-                "https://spotify.com",
-                "https://adobe.com",
-                "https://natwest.com",
-                "https://discord.com",
-            ];
+            // let urls = [
+            //     "https://natwest.com",
+            //     "https://booking.com",
+            //     "https://gumtree.com",
+            //     "https://ikea.com",
+            //     "https://msn.com",
+            //     "https://nationwide.co.uk",
+            //     "https://trustpilot.com",
+            //     "https://adobe.com",
+            //     "https://santander.co.uk",
+            //     "https://spotify.com",
+            //     "https://espncricinfo.com",
+            //     "https://last.fm",
+            //     "https://thesaurus.com",
+            //     "https://shein.co.uk",
+            //     "https://discogs.com",
+            //     "https://webex.com",
+            //     "https://asda.com",
+            //     "https://sainsburys.co.uk",
+            //     "https://freepik.com",
+            //     "https://unrealengine.com",
+            //     "https://sage.com",
+            //     "https://rbs.co.uk",
+            //     "https://thetrainline.com",
+            //     "https://shutterstock.com",
+            //     "https://halfords.com",
+            //     "https://hw.ac.uk",
+            //     "https://discordapp.com",
+            //     "https://motorsport.com",
+            //     "https://boots.com",
+            //     "https://cnn.com",
+            //     "https://discord.com",
+            //     "https://parentpay.com",
+            //     "https://behance.net",
+            //     "https://olx.pl",
+            //     "https://adme.ru",
+            //     "https://egress.com",
+            //     "https://reed.co.uk",
+            //     "https://instructure.com",
+            //     "https://soundcloud.com",
+            //     "https://tkmaxx.com",
+            //     "https://eonnext.com",
+            //     "https://ghanaweb.com",
+            //     "https://quizlet.com",
+            //     "https://www.ikea.com"
+            // ];
 
             // add tasks to queue
-            for (let url of top500) {
+            for (let url of top1600) {
                 queue.add(async () => createInstance(url));
             }
 
