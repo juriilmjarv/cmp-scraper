@@ -246,6 +246,8 @@ const queue = new PQueue({
             //     "https://www.ikea.com"
             // ];
 
+            let urls = ["https://www.force.com/"];
+
             // add tasks to queue
             for (let url of top1600) {
                 queue.add(async () => createInstance(url));
